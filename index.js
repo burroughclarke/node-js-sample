@@ -22,3 +22,26 @@ app.post('/', function(request, response){
 
     response.send("data received.");
 });
+
+
+const MongoClient = require('mongodb').MongoClient;
+
+// replace the uri string with your connection string.
+const uri = "mongodb+srv://burrough:mittens@cluster0-neprh.mongodb.net/test?retryWrites=true&w=majority"
+MongoClient.connect(uri, function(err, client) {
+   if(err) {
+        console.log('Error occurred while connecting to MongoDB Atlas...\n',err);
+   }
+   console.log('MongoDB Connected...');
+   const collection = client.db("test").collection("devices");
+   // perform actions on the collection object
+   
+   client.close();
+});
+
+// send data to server:
+// curl --data "param1=value1&param2=value2" https://stopfalls.herokuapp.com/
+
+
+
+
