@@ -21,8 +21,10 @@ app.post('/', function(request, response){
     console.log("client ip: " + ip)
 
     response.send("data received.");
-});
 
+    // connection is taking far too long to close
+    response.end();
+});
 
 const MongoClient = require('mongodb').MongoClient;
 
@@ -42,6 +44,9 @@ MongoClient.connect(uri, function(err, client) {
 // send data to server:
 // curl --data "param1=value1&param2=value2" https://stopfalls.herokuapp.com/
 
+// TODOs
+// – send android data to web app as JSON data
+// - send web app data to mongodb as JSON data
 
 
 
