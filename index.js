@@ -32,7 +32,9 @@ app.post('/', function(request, response){
 const MongoClient = require('mongodb').MongoClient;
 
 // replace the uri string with your connection string.
-const uri = "mongodb+srv://burrough:mittens@cluster0-neprh.mongodb.net/test?retryWrites=true&w=majority"
+// const uri = "mongodb+srv://burrough:mittens@cluster0-neprh.mongodb.net/test?retryWrites=true&w=majority"
+const uri = "mongodb+srv://burrough:mittens@stopfalls-neprh.mongodb.net/test?retryWrites=true&w=majority"
+
 MongoClient.connect(uri, function(err, client) {
    if(err) {
         console.log('Error occurred while connecting to MongoDB Atlas...\n',err);
