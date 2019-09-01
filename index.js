@@ -1,20 +1,38 @@
-const express = require('express')
-const jwt     = require('jsonwebtoken');
+const express     = require('express')
+const jwt         = require('jsonwebtoken');
+const bearerToken = require('express-bearer-token');
+const exjwt       = require('express-jwt');
+
 // const bodyParser = require('body-parser') // heroku doesn't like bodyparser ...
 
-const mongo_uri = "mongodb+srv://burrough:mittens@stopfalls-neprh.mongodb.net/test?retryWrites=true&w=majority"
-const stopfalls_db = "stopfalls_db"
+const mongo_uri    = "mongodb+srv://burrough:mittens@stopfalls-neprh.mongodb.net/test?retryWrites=true&w=majority"
+const stopfalls_db = "stopfalls_db";
+const jwt_key      = "secret_jwt_key";
+
+const jwtMW = exjwt({
+    secret: 'secret_jwt_key'
+});
 
 var app = express()
 app.set('port', (process.env.PORT || 5000))
 
 // replacement for bodyparser
 app.use(express.json());
-
+app.use(bearerToken());
 app.use(express.static(__dirname + '/public'))
 
 app.get('/', function(request, response) {
-  response.send('StopFalls Server');
+  
+  response.send('StopFalls Server. Your authentication token is: ' + request.token);
+
+  // obviously it is bad practice to need to have a block of code at the beginning
+  // of each server path to validate the JWT - there is functionality for this, no
+  // need to write your own. link: https://hptechblogs.com/using-json-web-token-for-authentication/
+
+  // verify a token symmetric - synchronous
+  var decoded = jwt.verify(request.token, jwt_key);
+  console.log("decoded:", decoded); // bar
+
   response.end();
 })
 
@@ -87,7 +105,7 @@ app.post('/login', function(request, response){
                     } else {
                         console.log("doc:", doc);
                         // 3. if they match, sign and send back a JWT token for future requests
-                        jwt.sign({ username: 'mittens' }, "secret private key", function(err, token) {
+                        jwt.sign({ username: 'mittens' }, jwt_key, function(err, token) {
                                 
                               if (err) {
                                 console.log(err);
@@ -178,6 +196,10 @@ MongoClient.connect(mongo_uri, function(err, client) {
 
 // signup
 // curl -i -X POST -H "Content-Type: application/json" -d '{"username":"mittens","password":"miow"}' http://localhost:5000/signup
+
+// send cookie through server
+// curl http://localhost:5000 -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1pdHRlbnMiLCJpYXQiOjE1NjczMTY2NjF9.F8e1AqQyEBWCeCREk_g0xUrALXDzKJtKjXja_mYhDIk"
+
 
 // TODOs
 // – send android data to web app as JSON data
