@@ -1,12 +1,17 @@
 var express    = require('express')
-// var bodyParser = require('body-parser')
+var bodyParser = require('body-parser')
 
 var app = express()
 
 app.set('port', (process.env.PORT || 5000))
 
+// heroku doesn't like bodyparser ...
+
 // parse application/x-www-form-urlencoded
 // app.use(bodyParser.urlencoded({ extended: false }))
+
+// replacement for bodyparser
+app.use(express.json());
 
 // parse application/json
 // app.use(bodyParser.json())
