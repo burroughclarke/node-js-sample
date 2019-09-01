@@ -1,12 +1,12 @@
 var express    = require('express')
-var bodyParser = require('body-parser')
+// var bodyParser = require('body-parser')
 
 var app = express()
 
 app.set('port', (process.env.PORT || 5000))
 
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }))
+// app.use(bodyParser.urlencoded({ extended: false }))
 
 // parse application/json
 app.use(bodyParser.json())
