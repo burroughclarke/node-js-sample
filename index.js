@@ -175,8 +175,19 @@ MongoClient.connect(mongo_uri, function(err, client) {
 
    // perform actions on the collection object
    
+
    client.close();
 });
+
+
+
+/* *********** Create ethereum accounts here ************** */
+var Web3 = require("web3");
+
+var web3 = new Web3('http://localhost:8545'); // your geth
+var account = web3.eth.accounts.create();
+
+console.log(account)
 
 
 
