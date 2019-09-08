@@ -149,12 +149,58 @@ app.post('/signup', function(request, response){
         console.log("address: ",      request.body.address);
         console.log("phone number: ", request.body.phone);
         console.log("email id: ",     request.body.email);
-        console.log("email id: ",     request.body.password);
+        console.log("password: ",     request.body.password);
 
         var myobj = request.body;
         dbo.collection("stopfalls_users").insertOne(myobj, function(err, res) {
             if (err) throw err;
             console.log("POST: 1 document inserted");
+            db.close();
+        });
+    });
+    // 1. submit the username and password into the database. 
+
+    var ip = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
+    console.log("client ip: " + ip)
+
+    var myJSON = { "response code": "200", 
+                   "description": "signup successful for new user [" + request.body.username + "]",
+                 };
+    response.send(myJSON);
+
+    // connection is taking far too long to close
+    response.end();
+    // will not reach here
+});
+
+
+// Access the parse results as request.body
+// (1) registration api : name, dob, user type, address, phone no, email id, 
+app.post('/update_user', function(request, response){
+    console.log("request.body:");
+    console.log(request.body);
+
+    MongoClient.connect(mongo_uri, function(err, db) {
+        console.log("POST: MongoDB connected");
+        if (err) throw err;
+        var dbo = db.db(stopfalls_db);
+        // var myobj = { name: "Company Inc", address: "Highway 37" };
+        
+        console.log("username: ",     request.body.username);
+        console.log("d-o-b: ",        request.body.dob);
+        console.log("user type: ",    request.body.user_type);
+        console.log("address: ",      request.body.address);
+        console.log("phone number: ", request.body.phone);
+        console.log("email id: ",     request.body.email);
+        console.log("password: ",     request.body.password);
+
+        // define the records to update (though you are using 'updateOne')
+        var myquery = { "username" : request.body.username };
+
+        var myobj = request.body;
+        dbo.collection("stopfalls_users").updateOne(myquery, myobj, function(err, res) {
+            if (err) throw err;
+            console.log("POST: 1 document updated");
             db.close();
         });
     });
