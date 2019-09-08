@@ -43,7 +43,7 @@ app.listen(app.get('port'), function() {
 // Access the parse results as request.body
 app.post('/', function(request, response){
 	console.log("request.body:");
-    console.log(request.body);
+  console.log(request.body);
 
     // prints lots of data
     // console.log("request:");
@@ -52,8 +52,8 @@ app.post('/', function(request, response){
     var ip = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
     console.log("client ip: " + ip)
 
-    var myJSON = { "name": "Chris", "age": "38" };
-    response.send(myJSON);
+    // var myJSON = { "name": "Chris", "age": "38" };
+    response.send("accelerometer data received");
 
     MongoClient.connect(mongo_uri, function(err, db) {
         console.log("POST: MongoDB connected");
@@ -193,10 +193,10 @@ app.post('/update_user', function(request, response){
         console.log("password: ",     request.body.password);
 
         // define the records to update (though you are using 'updateOne')
-        var myquery = { "username" : request.body.username };
+        var myquery = { "username" : request.body.username};
 
         var myobj = request.body;
-        dbo.collection("stopfalls_users").updateOne(myquery, myobj, function(err, res) {
+        dbo.collection("stopfalls_users").update(myquery, myobj, function(err, res) {
             if (err) throw err;
             console.log("POST: 1 document updated");
             db.close();
