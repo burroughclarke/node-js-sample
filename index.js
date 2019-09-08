@@ -149,6 +149,7 @@ app.post('/signup', function(request, response){
         console.log("address: ",      request.body.address);
         console.log("phone number: ", request.body.phone);
         console.log("email id: ",     request.body.email);
+        console.log("email id: ",     request.body.password);
 
         var myobj = request.body;
         dbo.collection("stopfalls_users").insertOne(myobj, function(err, res) {
@@ -162,13 +163,56 @@ app.post('/signup', function(request, response){
     var ip = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
     console.log("client ip: " + ip)
 
-    var myJSON = { "response code": "200", "description": "signup successful" };
+    var myJSON = { "response code": "200", 
+                   "description": "signup successful for new user [" + request.body.username + "]",
+                 };
     response.send(myJSON);
 
     // connection is taking far too long to close
     response.end();
     // will not reach here
 });
+
+
+
+app.post('/add_older', function(request, response){
+    console.log("request.body:");
+    console.log(request.body);
+
+    MongoClient.connect(mongo_uri, function(err, db) {
+        console.log("POST: MongoDB connected");
+        if (err) throw err;
+        var dbo = db.db(stopfalls_db);
+        // var myobj = { name: "Company Inc", address: "Highway 37" };
+
+        console.log("username: ",     request.body.username);
+        console.log("password: ",     request.body.password);
+        console.log("email: ",        request.body.email);
+        console.log("phone number: ", request.body.phone);
+
+        var myobj = request.body;
+        dbo.collection("stopfalls_olds").insertOne(myobj, function(err, res) {
+            if (err) throw err;
+            console.log("POST: 1 document inserted");
+            db.close();
+        });
+    });
+    // 1. submit the username and password into the database. 
+
+    var ip = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
+    console.log("client ip: " + ip)
+
+    var myJSON = { "response code": "200", 
+                   "description": "old person added for carer [" + request.body.username + "]", 
+                 };
+    response.send(myJSON);
+
+    // connection is taking far too long to close
+    response.end();
+    // will not reach here
+});
+
+
 
 const MongoClient = require('mongodb').MongoClient;
 
