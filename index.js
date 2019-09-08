@@ -41,7 +41,7 @@ app.listen(app.get('port'), function() {
 })
 
 // Access the parse results as request.body
-app.post('/', function(request, response){
+app.post('/activity_data', function(request, response){
 	console.log("request.body:");
   console.log(request.body);
 
@@ -61,7 +61,7 @@ app.post('/', function(request, response){
         var dbo = db.db(stopfalls_db);
         // var myobj = { name: "Company Inc", address: "Highway 37" };
         var myobj = request.body;
-        dbo.collection("stopfalls_collection").insertOne(myobj, function(err, res) {
+        dbo.collection("stopfalls_activity").insertOne(myobj, function(err, res) {
             if (err) throw err;
             console.log("POST: 1 document inserted");
             db.close();
