@@ -167,8 +167,6 @@ app.post('/signup', function(request, response){
                    "description": "signup successful for new user [" + request.body.username + "]",
                  };
     response.send(myJSON);
-
-    // connection is taking far too long to close
     response.end();
     // will not reach here
 });
@@ -210,16 +208,12 @@ app.post('/update_user', function(request, response){
     console.log("client ip: " + ip)
 
     var myJSON = { "response code": "200", 
-                   "description": "signup successful for new user [" + request.body.username + "]",
+                   "description": "user details updated for user [" + request.body.username + "]",
                  };
     response.send(myJSON);
-
-    // connection is taking far too long to close
     response.end();
     // will not reach here
 });
-
-
 
 app.post('/add_older', function(request, response){
     console.log("request.body:");
@@ -252,8 +246,34 @@ app.post('/add_older', function(request, response){
                    "description": "old person added for carer [" + request.body.username + "]", 
                  };
     response.send(myJSON);
+    response.end();
+    // will not reach here
+});
 
-    // connection is taking far too long to close
+app.post('/clear_users', function(request, response){
+    console.log("request.body:");
+    console.log(request.body);
+
+    MongoClient.connect(mongo_uri, function(err, db) {
+        console.log("POST: MongoDB connected");
+        if (err) throw err;
+        var dbo = db.db(stopfalls_db);
+
+        var myobj = request.body;
+        dbo.collection("stopfalls_users").remove({}, function(err, res) {
+            if (err) throw err;
+            db.close();
+        });
+    });
+    // 1. submit the username and password into the database. 
+
+    var ip = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
+    console.log("client ip: " + ip)
+
+    var myJSON = { "response code": "200", 
+                   "description": "all user records removed", 
+                 };
+    response.send(myJSON);
     response.end();
     // will not reach here
 });
