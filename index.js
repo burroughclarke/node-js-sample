@@ -36,6 +36,30 @@ app.get('/', function(request, response) {
   response.end();
 })
 
+app.get('/visual', function(request, response) {
+  
+  var id = req.query.username; // $_GET["id"]
+  console.log("retrieving activity data for id [" + id + "]");
+
+  myqry = { "username": id };
+  MongoClient.connect(mongo_uri, function(err, db) {
+      console.log("POST: MongoDB connected");
+      if (err) throw err;
+      var dbo = db.db(stopfalls_db);
+      // var myobj = { name: "Company Inc", address: "Highway 37" };
+      var myobj = request.body;
+      dbo.collection("stopfalls_activity").find(myqry, function(err, res) {
+          if (err) throw err;
+
+          console.log("res: " + res)
+          db.close();
+      });
+  });
+
+  response.send("")
+  response.end();
+})
+
 app.listen(app.get('port'), function() {
   console.log("Node app is running at localhost:" + app.get('port'))
 })
