@@ -132,6 +132,7 @@ app.post('/login', function(request, response){
 });
 
 // Access the parse results as request.body
+// (1) registration api : name, dob, user type, address, phone no, email id, 
 app.post('/signup', function(request, response){
     console.log("request.body:");
     console.log(request.body);
@@ -141,6 +142,14 @@ app.post('/signup', function(request, response){
         if (err) throw err;
         var dbo = db.db(stopfalls_db);
         // var myobj = { name: "Company Inc", address: "Highway 37" };
+        
+        console.log("username: ", request.body.username);
+        console.log("d-o-b: ", request.body.dob);
+        console.log("user type: ", request.body.user_type);
+        console.log("address: ", request.body.phone_address);
+        console.log("phone number: ", request.body.phone_number);
+        console.log("email id: ", request.body.email_id);
+
         var myobj = request.body;
         dbo.collection("stopfalls_users").insertOne(myobj, function(err, res) {
             if (err) throw err;
