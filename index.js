@@ -143,12 +143,12 @@ app.post('/signup', function(request, response){
         var dbo = db.db(stopfalls_db);
         // var myobj = { name: "Company Inc", address: "Highway 37" };
         
-        console.log("username: ", request.body.username);
-        console.log("d-o-b: ", request.body.dob);
-        console.log("user type: ", request.body.user_type);
-        console.log("address: ", request.body.phone_address);
-        console.log("phone number: ", request.body.phone_number);
-        console.log("email id: ", request.body.email_id);
+        console.log("username: ",     request.body.username);
+        console.log("d-o-b: ",        request.body.dob);
+        console.log("user type: ",    request.body.user_type);
+        console.log("address: ",      request.body.address);
+        console.log("phone number: ", request.body.phone);
+        console.log("email id: ",     request.body.email);
 
         var myobj = request.body;
         dbo.collection("stopfalls_users").insertOne(myobj, function(err, res) {
