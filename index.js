@@ -46,10 +46,13 @@ app.get('/home', function(request, response) {
 
 app.get('/visual', function(request, response) {
 
-  var id = request.query.username;
-  console.log("retrieving activity data for id [" + id + "]");
+  var username = request.query.username;
+  var phone    = request.query.phone;
 
-  myqry = { "username": id };
+  console.log("retrieving activity data for username   [" + username + "]");
+  console.log("retrieving activity data for old person [" + phone    + "]");
+
+  myqry = { "username": username};
   response_string = ""
   MongoClient.connect(mongo_uri, function(err, db) {
       console.log("POST: MongoDB connected");
@@ -64,7 +67,7 @@ app.get('/visual', function(request, response) {
           }
           // done or error
           console.log("finished processing ...");
-          response.render('visual', { title: 'Activity Data for user: ' + id, message: response_string })
+          response.render('visual', { title: 'Activity Data for user [' + username + "] for old person [" + phone + "]", message: response_string })
           // response.send("response_string = [" + response_string + "]");
           // response.end(); // cause error 'cannot set headers after being sent'
         });
@@ -173,13 +176,13 @@ app.post('/signup', function(request, response){
     console.log("request.body:");
     console.log(request.body);
 
-    MongoClient.connect(mongo_uri, function(err, db) {
+    MongoClient.connect(mongo_uri, function(err, db) {. //  V823264@epack2   QfWxL6pf
         console.log("POST: MongoDB connected");
         if (err) throw err;
         var dbo = db.db(stopfalls_db);
         // var myobj = { name: "Company Inc", address: "Highway 37" };
         
-        console.log("username: ",     request.body.username);
+        console.log("name: ",         request.body.name);
         console.log("d-o-b: ",        request.body.dob);
         console.log("user type: ",    request.body.user_type);
         console.log("address: ",      request.body.address);
