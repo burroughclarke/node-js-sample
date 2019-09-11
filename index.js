@@ -43,6 +43,18 @@ app.get('/home', function(request, response) {
   response.render('visual', { title: 'Hey', message: 'Hello there!' })
 })
 
+function timeConverter(UNIX_timestamp){
+  var a = new Date(UNIX_timestamp * 1000);
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var year = a.getFullYear();
+  var month = months[a.getMonth()];
+  var date = a.getDate();
+  var hour = a.getHours();
+  var min = a.getMinutes();
+  var sec = a.getSeconds();
+  var time = date + '-' + month + '-' + year + '-' + hour + '-' + min + '-' + sec ;
+  return time;
+}
 
 app.get('/visual', function(request, response) {
 
@@ -52,22 +64,22 @@ app.get('/visual', function(request, response) {
   console.log("retrieving activity data for username   [" + username + "]");
   console.log("retrieving activity data for old person [" + phone    + "]");
 
-  myqry = { "username": username};
-  response_string = ""
+  myqry = { "phone": phone};
+  response_string = "timestamp,accel-X,accel-Y,accel-Z\n";
   MongoClient.connect(mongo_uri, function(err, db) {
       console.log("POST: MongoDB connected");
       if (err) throw err;
       var dbo = db.db(stopfalls_db);
       dbo.collection("stopfalls_activity").find(myqry).forEach(function(doc) {
-          response_string += doc['accelX'] + ","
+          response_string += doc['timestamp'] + "," + doc['accelX'] + "," + doc['accelY'] + "," + doc['accelZ'] + "\n"
           console.log(doc);
         }, function(err) {
           if (err) {
             console.log(err);
           }
           // done or error
-          console.log("finished processing ...");
-          response.render('visual', { title: 'Activity Data for user [' + username + "] for old person [" + phone + "]", message: response_string })
+          console.log("finished processing ... response_string = [" + response_string + "]");
+          response.render('visual', { title: 'Activity Data for user [' + username + "] for old person [" + phone + "]", message: response_string, phone: phone })
           // response.send("response_string = [" + response_string + "]");
           // response.end(); // cause error 'cannot set headers after being sent'
         });
@@ -176,7 +188,7 @@ app.post('/signup', function(request, response){
     console.log("request.body:");
     console.log(request.body);
 
-    MongoClient.connect(mongo_uri, function(err, db) {. //  V823264@epack2   QfWxL6pf
+    MongoClient.connect(mongo_uri, function(err, db) {
         console.log("POST: MongoDB connected");
         if (err) throw err;
         var dbo = db.db(stopfalls_db);
@@ -289,6 +301,7 @@ app.post('/add_older', function(request, response){
     // will not reach here
 });
 
+
 app.post('/clear_users', function(request, response){
     console.log("request.body:");
     console.log(request.body);
@@ -317,27 +330,27 @@ app.post('/clear_users', function(request, response){
     // will not reach here
 });
 
-
-
-const MongoClient = require('mongodb').MongoClient;
+// test that the mongodb is connecting correctly
+const testdb = require('./testdb.js');
 
 // replace the uri string with your connection string.
 
 //           mongodb+srv://burrough:mittens@stopfalls-neprh.mongodb.net/test?retryWrites=true&w=majority
-MongoClient.connect(mongo_uri, function(err, client) {
-   if(err) {
-        console.log('Error occurred while connecting to MongoDB Atlas...\n',err);
-   }
-   console.log('MongoDB Connected...');
-   const collection = client.db("stopfalls_db").collection("stopfalls_collection");
+// const MongoClient = require('mongodb').MongoClient;
+// MongoClient.connect(mongo_uri, function(err, client) {
+//    if(err) {
+//         console.log('Error occurred while connecting to MongoDB Atlas...\n',err);
+//    }
+//    console.log('MongoDB Connected...');
+//    const collection = client.db("stopfalls_db").collection("stopfalls_collection");
 
-   // perform actions on the collection object
+//    // perform actions on the collection object
    
 
-   client.close();
-});
+//    client.close();
+// });
 
-
+const MongoClient = require('mongodb').MongoClient;
 
 /* *********** Create ethereum accounts here ************** */
 var Web3 = require("web3");

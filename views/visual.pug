@@ -1,9 +1,73 @@
 html
   head
     title= title
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.js"></script>
   body
-    h1= title
-    h1= message
+    h1.kitty#kittyid= title
+    h4= message
+    <div id="graphdiv"></div>
 
+script.
+ 
+ // console.log("message = " + message); // 'timestamp is not defined'
+ // mymessage = !{message} // 'timestamp is not defined'
+ let kittystring = !{JSON.stringify(message)}
+ // console.log("mymessage: " + mymessage)
+ // kittystring = document.getElementById("kittyid");
+ console.log("kittystring = " + kittystring);
+
+ g = new Dygraph(
+
+ // containing div
+ document.getElementById("graphdiv"),
+
+ kittystring,
+
+  {
+    // customBars: true,
+    title: 'Activity Data for [' + !{JSON.stringify(phone)} + "]",
+    ylabel: 'G Force',
+    // legend: 'always',
+    // showRangeSelector: true
+  },
+
+ // working: 
+ //"Date,Temperature\n" +
+ //"2008-05-07,75\n" +
+ //"2008-05-08,70\n" +
+ //"2008-05-09,80\n"
+
+ );
+
+ console.log("miow");
+
+ // const mongo_uri    = "mongodb+srv://burrough:mittens@stopfalls-neprh.mongodb.net/test?retryWrites=true&w=majority"
+ // const MongoClient = require('mongodb').MongoClient;
+ // MongoClient.connect(mongo_uri, function(err, db) {
+ //      console.log("POST: MongoDB connected");
+ //      if (err) throw err;
+ //      var dbo = db.db(stopfalls_db);
+ //      dbo.collection("stopfalls_activity").find(myqry).forEach(function(doc) {
+ //          response_string += doc['timestamp'] + "," + doc['accelX'] + "," + doc['accelY']+ "," + doc['accelZ']
+ //          console.log(doc);
+ //        }, function(err) {
+ //          if (err) {
+ //            console.log(err);
+ //          }
+ //          // done or error
+ //          console.log("finished processing ...");
+ //          // response.send("response_string = [" + response_string + "]");
+ //          // response.end(); // cause error 'cannot set headers after being sent'
+ //        });
+ //  });
 
 // comment
+
+// why???
+// 
+
+
+// feature extraction
+// 
