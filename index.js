@@ -330,6 +330,34 @@ app.post('/clear_users', function(request, response){
     // will not reach here
 });
 
+app.post('/clear_activity', function(request, response){
+    console.log("request.body:");
+    console.log(request.body);
+
+    MongoClient.connect(mongo_uri, function(err, db) {
+        console.log("POST: MongoDB connected");
+        if (err) throw err;
+        var dbo = db.db(stopfalls_db);
+
+        var myobj = request.body;
+        dbo.collection("stopfalls_activity").remove({}, function(err, res) {
+            if (err) throw err;
+            db.close();
+        });
+    });
+    // 1. submit the username and password into the database. 
+
+    var ip = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
+    console.log("client ip: " + ip)
+
+    var myJSON = { "response code": "200", 
+                   "description": "all user records removed", 
+                 };
+    response.send(myJSON);
+    response.end();
+    // will not reach here
+});
+
 // test that the mongodb is connecting correctly
 const testdb = require('./testdb.js');
 
