@@ -351,7 +351,7 @@ app.post('/clear_activity', function(request, response){
     console.log("client ip: " + ip)
 
     var myJSON = { "response code": "200", 
-                   "description": "all user records removed", 
+                   "description": "all activity data removed", 
                  };
     response.send(myJSON);
     response.end();
