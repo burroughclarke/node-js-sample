@@ -78,8 +78,8 @@ app.get('/visual', function(request, response) {
             console.log(err);
           }
           // done or error
-          // console.log("finished processing ... response_string = [" + response_string + "]");
-          response.render('visual', { title: 'Activity Data for user [' + username + "] for old person [" + phone + "]", message: "Accelerometer data plotted", phone: phone })
+          console.log("finished processing ... response_string = [" + response_string + "]");
+          response.render('visual', { title: 'Activity Data for user [' + username + "] for old person [" + phone + "]", message: response_string, phone: phone })
           // response.send("response_string = [" + response_string + "]");
           // response.end(); // cause error 'cannot set headers after being sent'
         });
