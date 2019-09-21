@@ -10,10 +10,8 @@ const mongo_uri    = "mongodb+srv://burrough:mittens@stopfalls-neprh.mongodb.net
 const stopfalls_db = "stopfalls_db";
 const jwt_key      = "secret_jwt_key";
 
-// const jwtMW = exjwt({
-//     secret: 'secret_jwt_key'
-// });
-
+// test that the mongodb is connecting correctly
+const testdb = require('./testdb.js');
 
 var app = express()
 
@@ -165,8 +163,8 @@ app.post('/login', function(request, response){
                           // flatten json from three layers to two
                           for(var i = 0; i < result.length; i++) {
                               var obj = result[i];
-                              myObject[i] = obj.username + "_" + obj.qrcode;
-                              console.log(obj.username + "_" + obj.qrcode);
+                              myObject[i] = obj.oldname + "_" + obj.qrcode;
+                              console.log(obj.oldname + "_" + obj.qrcode);
                           }
                           console.log("myObject: ", myObject);
 
@@ -307,7 +305,7 @@ app.post('/add_older', function(request, response){
     console.log("client ip: " + ip)
 
     var myJSON = { "response code": "200", 
-                   "description": "old person added for carer [" + request.body.username + "]", 
+                   "description": "old person [" + request.body.oldname + "] added for carer [" + request.body.username + "]", 
                  };
     response.send(myJSON);
     response.end();
@@ -371,8 +369,7 @@ app.post('/clear_activity', function(request, response){
     // will not reach here
 });
 
-// test that the mongodb is connecting correctly
-const testdb = require('./testdb.js');
+
 
 // replace the uri string with your connection string.
 
