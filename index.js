@@ -2,7 +2,7 @@ const express     = require('express')
 const jwt         = require('jsonwebtoken');
 const bearerToken = require('express-bearer-token');
 const exjwt       = require('express-jwt');
-const flatten     = require('flat')   // heroku server crash but not on localhost
+// const flatten     = require('flat')   // heroku server crash but not on localhost
 
 // const bodyParser = require('body-parser') // heroku doesn't like bodyparser ...
 
@@ -159,7 +159,19 @@ app.post('/login', function(request, response){
                         dbo.collection("stopfalls_olds").find({'username':request.body.username}).toArray(function(err, result) {
                           if (err) throw err;
                           console.log(result);
-                          response.send(flatten(result));
+
+                          // make an empty object
+                          var myObject = {};
+                          // flatten json from three layers to two
+                          for(var i = 0; i < result.length; i++) {
+                              var obj = result[i];
+                              myObject[i] = obj.username + "_" + obj.qrcode;
+                              console.log(obj.username + "_" + obj.qrcode);
+                          }
+                          console.log("myObject: ", myObject);
+
+                          // massive issue with 'jsonArray' needing to be send and received from Volley
+                          response.send(myObject);
                           db.close();
                         });
                       
