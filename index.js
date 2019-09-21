@@ -2,6 +2,7 @@ const express     = require('express')
 const jwt         = require('jsonwebtoken');
 const bearerToken = require('express-bearer-token');
 const exjwt       = require('express-jwt');
+const flatten     = require('flat')
 
 // const bodyParser = require('body-parser') // heroku doesn't like bodyparser ...
 
@@ -158,7 +159,7 @@ app.post('/login', function(request, response){
                         dbo.collection("stopfalls_olds").find({'username':request.body.username}).toArray(function(err, result) {
                           if (err) throw err;
                           console.log(result);
-                          response.send(result);
+                          response.send(flatten(result));
                           db.close();
                         });
                       
