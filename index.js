@@ -2,7 +2,7 @@ const express     = require('express')
 const jwt         = require('jsonwebtoken');
 const bearerToken = require('express-bearer-token');
 const exjwt       = require('express-jwt');
-const flatten     = require('flat')
+const flatten     = require('flat')   // heroku server crash but not on localhost
 
 // const bodyParser = require('body-parser') // heroku doesn't like bodyparser ...
 
