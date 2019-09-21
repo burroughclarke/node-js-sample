@@ -9,9 +9,9 @@ const mongo_uri    = "mongodb+srv://burrough:mittens@stopfalls-neprh.mongodb.net
 const stopfalls_db = "stopfalls_db";
 const jwt_key      = "secret_jwt_key";
 
-const jwtMW = exjwt({
-    secret: 'secret_jwt_key'
-});
+// const jwtMW = exjwt({
+//     secret: 'secret_jwt_key'
+// });
 
 
 var app = express()
@@ -26,7 +26,7 @@ app.use(express.static(__dirname + '/public'))
 
 app.get('/', function(request, response) {
   
-  response.send('StopFalls Server. Your authentication token is: ' + request.token);
+  response.send('StopFalls Server. See <strong>https://github.cs.adelaide.edu.au/mobile-wireless-systems-2019-s2/stopfalls-beta/wiki/Server-API-%E2%80%93-21-9-19 </strong> for API');
 
   // obviously it is bad practice to need to have a block of code at the beginning
   // of each server path to validate the JWT - there is functionality for this, no
@@ -143,31 +143,25 @@ app.post('/login', function(request, response){
         //   console.log("username matching password: " + result.name);
         //   db.close();
         // });
-        console.log("request.body.username: [" + request.body.username + "]")
+        console.log("request.body.username: [" + request.body.username + "] password [" + request.body.password + "]");
 
         var dbo = db.db(stopfalls_db);
         // 2. retrieve what the database stores about 'username' and 'password'
-        dbo.collection('stopfalls_users').findOne({'username':request.body.username})
+        dbo.collection('stopfalls_users').findOne({'username':request.body.username, 'password':request.body.password})
              .then(function(doc) {
                     if(!doc) {
-                       throw new Error('No record found.....');
-                       var myJSON = {"description": "login failed","jwt": "error"};
+                       var myJSON = {"description": "login failed"};
                        response.send(myJSON);
                     } else {
-                        console.log("doc:", doc);
-                        // 3. if they match, sign and send back a JWT token for future requests
-                        jwt.sign({ username: 'mittens' }, jwt_key, function(err, token) {
-                                
-                              if (err) {
-                                console.log(err);
-                              }
+                        console.log("users doc:", doc);
 
-                              mytoken = token;
-
-                              console.log("token:", token);
-                              var myJSON = {"description": "login successful","jwt": token};
-                              response.send(myJSON);
-                      });   
+                        dbo.collection("stopfalls_olds").find({'username':request.body.username}).toArray(function(err, result) {
+                          if (err) throw err;
+                          console.log(result);
+                          response.send(result);
+                          db.close();
+                        });
+                      
                     }
               });
     });
@@ -185,40 +179,53 @@ app.post('/login', function(request, response){
 // Access the parse results as request.body
 // (1) registration api : name, dob, user type, address, phone no, email id, 
 app.post('/signup', function(request, response){
-    console.log("request.body:");
-    console.log(request.body);
 
     MongoClient.connect(mongo_uri, function(err, db) {
         console.log("POST: MongoDB connected");
         if (err) throw err;
         var dbo = db.db(stopfalls_db);
+        var ip = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
         // var myobj = { name: "Company Inc", address: "Highway 37" };
-        
-        console.log("name: ",         request.body.name);
-        console.log("d-o-b: ",        request.body.dob);
-        console.log("user type: ",    request.body.user_type);
-        console.log("address: ",      request.body.address);
-        console.log("phone number: ", request.body.phone);
-        console.log("email id: ",     request.body.email);
+
+        console.log("request.body:", request.body);
+        console.log("username: ",     request.body.username);
         console.log("password: ",     request.body.password);
+        console.log("client ip: ",    ip)
+        
+        var failureJSON = {"description": "login failed"};
+        var successJSON = {"description": "signup successful for new user [" + request.body.username + "]"};
 
-        var myobj = request.body;
-        dbo.collection("stopfalls_users").insertOne(myobj, function(err, res) {
-            if (err) throw err;
-            console.log("POST: 1 document inserted");
-            db.close();
-        });
+                  // TODO: filter for duplicate registrations
+
+        // check the username is not already in use
+        // dbo.collection('stopfalls_users').findOne({'username':request.body.username})
+        //  .then(function(doc) {
+        //         if(!doc) {
+        //             if (err) throw err;
+        //            console.log("failure: document error");
+        //            response.send(failureJSON);
+        //         } else {
+        //             console.log("users doc:", doc);
+        //             console.log("users doc[username]:", doc['username']);
+
+        //             if (doc['username'] == request.body.username) {
+        //                 console.log("failure: username already taken");
+        //                 response.send(failureJSON);
+        //                 response.end();
+        //             }
+        //             else {
+                        var myobj = request.body;
+                        dbo.collection("stopfalls_users").insertOne(myobj, function(err, res) {
+                            if (err) throw err;
+                            console.log("POST: 1 document inserted");
+                            db.close();
+                        });
+                            response.send(successJSON);
+                            response.end();
+    //                 }
+    //             }
+    //       });
     });
-    // 1. submit the username and password into the database. 
-
-    var ip = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
-    console.log("client ip: " + ip)
-
-    var myJSON = { "response code": "200", 
-                   "description": "signup successful for new user [" + request.body.username + "]",
-                 };
-    response.send(myJSON);
-    response.end();
     // will not reach here
 });
 
@@ -236,11 +243,6 @@ app.post('/update_user', function(request, response){
         // var myobj = { name: "Company Inc", address: "Highway 37" };
         
         console.log("username: ",     request.body.username);
-        console.log("d-o-b: ",        request.body.dob);
-        console.log("user type: ",    request.body.user_type);
-        console.log("address: ",      request.body.address);
-        console.log("phone number: ", request.body.phone);
-        console.log("email id: ",     request.body.email);
         console.log("password: ",     request.body.password);
 
         // define the records to update (though you are using 'updateOne')
@@ -276,10 +278,8 @@ app.post('/add_older', function(request, response){
         var dbo = db.db(stopfalls_db);
         // var myobj = { name: "Company Inc", address: "Highway 37" };
 
-        console.log("username: ",     request.body.username);
-        console.log("password: ",     request.body.password);
-        console.log("email: ",        request.body.email);
-        console.log("phone number: ", request.body.phone);
+        console.log("username: ", request.body.username);
+        console.log("qrcode: ",   request.body.qrcode);
 
         var myobj = request.body;
         dbo.collection("stopfalls_olds").insertOne(myobj, function(err, res) {
@@ -381,12 +381,10 @@ const testdb = require('./testdb.js');
 const MongoClient = require('mongodb').MongoClient;
 
 /* *********** Create ethereum accounts here ************** */
-var Web3 = require("web3");
-
-var web3 = new Web3('http://localhost:8545'); // your geth
-var account = web3.eth.accounts.create();
-
-console.log(account)
+// var Web3 = require("web3");
+// var web3 = new Web3('http://localhost:8545'); // your geth
+// var account = web3.eth.accounts.create();
+// console.log(account)
 
 
 
