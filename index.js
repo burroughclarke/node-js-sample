@@ -57,13 +57,11 @@ function timeConverter(UNIX_timestamp){
 
 app.get('/visual', function(request, response) {
 
-  var username = request.query.username;
-  var phone    = request.query.phone;
+  var qrcode = request.query.qrcode;
 
-  console.log("retrieving activity data for username   [" + username + "]");
-  console.log("retrieving activity data for old person [" + phone    + "]");
+  console.log("retrieving activity data for qrcode [" + qrcode + "]");
 
-  myqry = { "phone": phone};
+  myqry = { "qrcode": qrcode};
   response_string = "timestamp,accel-X,accel-Y,accel-Z\n";
   MongoClient.connect(mongo_uri, function(err, db) {
       console.log("POST: MongoDB connected");
@@ -78,7 +76,7 @@ app.get('/visual', function(request, response) {
           }
           // done or error
           console.log("finished processing ... response_string = [" + response_string + "]");
-          response.render('visual', { title: 'Activity Data for user [' + username + "] for old person [" + phone + "]", message: response_string, phone: phone })
+          response.render('visual', { title: 'Activity Data for old person with qrcode [' + phone + "]", message: response_string, qrcode: qrcode })
           // response.send("response_string = [" + response_string + "]");
           // response.end(); // cause error 'cannot set headers after being sent'
         });
@@ -142,11 +140,11 @@ app.post('/login', function(request, response){
         //   console.log("username matching password: " + result.name);
         //   db.close();
         // });
-        console.log("request.body.username: [" + request.body.username + "] password [" + request.body.password + "]");
+        console.log("request.body.phone: [" + request.body.phone + "] password [" + request.body.password + "]");
 
         var dbo = db.db(stopfalls_db);
         // 2. retrieve what the database stores about 'username' and 'password'
-        dbo.collection('stopfalls_users').findOne({'username':request.body.username, 'password':request.body.password})
+        dbo.collection('stopfalls_users').findOne({'phone':request.body.phone, 'password':request.body.password})
              .then(function(doc) {
                     if(!doc) {
                        var myJSON = {"description": "login failed"};
@@ -154,7 +152,7 @@ app.post('/login', function(request, response){
                     } else {
                         console.log("users doc:", doc);
 
-                        dbo.collection("stopfalls_olds").find({'username':request.body.username}).toArray(function(err, result) {
+                        dbo.collection("stopfalls_olds").find({'phone':request.body.phone}).toArray(function(err, result) {
                           if (err) throw err;
                           console.log(result);
 
@@ -199,12 +197,12 @@ app.post('/signup', function(request, response){
         // var myobj = { name: "Company Inc", address: "Highway 37" };
 
         console.log("request.body:", request.body);
-        console.log("username: ",     request.body.username);
+        console.log("phone: ",     request.body.phone);
         console.log("password: ",     request.body.password);
         console.log("client ip: ",    ip)
         
         var failureJSON = {"description": "login failed"};
-        var successJSON = {"description": "signup successful for new user [" + request.body.username + "]"};
+        var successJSON = {"description": "signup successful for new user [" + request.body.phone + "]"};
 
                   // TODO: filter for duplicate registrations
 
@@ -253,11 +251,11 @@ app.post('/update_user', function(request, response){
         var dbo = db.db(stopfalls_db);
         // var myobj = { name: "Company Inc", address: "Highway 37" };
         
-        console.log("username: ",     request.body.username);
+        console.log("phone: ",     request.body.phone);
         console.log("password: ",     request.body.password);
 
         // define the records to update (though you are using 'updateOne')
-        var myquery = { "username" : request.body.username};
+        var myquery = { "phone" : request.body.phone};
 
         var myobj = request.body;
         dbo.collection("stopfalls_users").update(myquery, myobj, function(err, res) {
@@ -272,7 +270,7 @@ app.post('/update_user', function(request, response){
     console.log("client ip: " + ip)
 
     var myJSON = { "response code": "200", 
-                   "description": "user details updated for user [" + request.body.username + "]",
+                   "description": "user details updated for user [" + request.body.phone + "]",
                  };
     response.send(myJSON);
     response.end();
@@ -289,7 +287,7 @@ app.post('/add_older', function(request, response){
         var dbo = db.db(stopfalls_db);
         // var myobj = { name: "Company Inc", address: "Highway 37" };
 
-        console.log("username: ", request.body.username);
+        console.log("phone: ", request.body.phone);
         console.log("qrcode: ",   request.body.qrcode);
 
         var myobj = request.body;
@@ -305,7 +303,7 @@ app.post('/add_older', function(request, response){
     console.log("client ip: " + ip)
 
     var myJSON = { "response code": "200", 
-                   "description": "old person [" + request.body.oldname + "] added for carer [" + request.body.username + "]", 
+                   "description": "old person [" + request.body.oldname + "] added for carer [" + request.body.phone + "]", 
                  };
     response.send(myJSON);
     response.end();
