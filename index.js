@@ -252,7 +252,7 @@ app.post('/update_user', function(request, response){
         // var myobj = { name: "Company Inc", address: "Highway 37" };
         
         console.log("phone: ",     request.body.phone);
-        console.log("password: ",     request.body.password);
+        console.log("password: ",  request.body.password);
 
         // define the records to update (though you are using 'updateOne')
         var myquery = { "phone" : request.body.phone};
