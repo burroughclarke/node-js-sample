@@ -187,6 +187,14 @@ app.post('/login', function(request, response){
 
 // Access the parse results as request.body
 // (1) registration api : name, dob, user type, address, phone no, email id, 
+
+// checks if a username already exists in the database. 
+function doesUsernameExist(dbo, phone) {
+            // check the username is not already in use
+
+}
+
+
 app.post('/signup', function(request, response){
 
     MongoClient.connect(mongo_uri, function(err, db) {
@@ -196,44 +204,43 @@ app.post('/signup', function(request, response){
         var ip = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
         // var myobj = { name: "Company Inc", address: "Highway 37" };
 
-        console.log("request.body:", request.body);
-        console.log("phone: ",     request.body.phone);
-        console.log("password: ",     request.body.password);
-        console.log("client ip: ",    ip)
+        console.log("request.body:",request.body);
+        console.log("phone: ",      request.body.phone);
+        console.log("password: ",   request.body.password);
+        console.log("client ip: ",  ip)
         
-        var failureJSON = {"description": "login failed"};
+        var failureJSON = {"description": "signup failed: phone number is already taken"};
         var successJSON = {"description": "signup successful for new user [" + request.body.phone + "]"};
 
-                  // TODO: filter for duplicate registrations
+        dbo.collection('stopfalls_users').findOne({'phone':request.body.phone})
+         .then(function(doc) {
+                // if the document is empty, that doesn't mean there is an error, if no respose is intended
+                if (!doc) {
+                   console.log("checkUsernameExists.failure: document is empty");
+                //    response.send(failureJSON);
+                } 
+                else {
+                      console.log("checkUsernameExists.users doc:", doc);
+                      console.log("checkUsernameExists.users doc[phone]:", doc['phone']);
 
-        // check the username is not already in use
-        // dbo.collection('stopfalls_users').findOne({'username':request.body.username})
-        //  .then(function(doc) {
-        //         if(!doc) {
-        //             if (err) throw err;
-        //            console.log("failure: document error");
-        //            response.send(failureJSON);
-        //         } else {
-        //             console.log("users doc:", doc);
-        //             console.log("users doc[username]:", doc['username']);
+                      if (doc['phone'] == request.body.phone) {
+                        console.log("checkUsernameExists.failure: phone already taken");
+                        response.send(failureJSON);
+                        response.end();                    
+                      } 
+                    }
+                console.log("checkUsernameExists.success: phone is free");
+                var myobj = request.body;
+                dbo.collection("stopfalls_users").insertOne(myobj, function(err, res) {
+                    if (err) throw err;
+                    console.log("POST: 1 document inserted");
+                    db.close();
+                });
+                response.send(successJSON);
+                response.end();
+   
+              });
 
-        //             if (doc['username'] == request.body.username) {
-        //                 console.log("failure: username already taken");
-        //                 response.send(failureJSON);
-        //                 response.end();
-        //             }
-        //             else {
-                        var myobj = request.body;
-                        dbo.collection("stopfalls_users").insertOne(myobj, function(err, res) {
-                            if (err) throw err;
-                            console.log("POST: 1 document inserted");
-                            db.close();
-                        });
-                            response.send(successJSON);
-                            response.end();
-    //                 }
-    //             }
-    //       });
     });
     // will not reach here
 });
