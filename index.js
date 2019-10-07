@@ -76,7 +76,7 @@ app.get('/visual', function(request, response) {
           }
           // done or error
           console.log("finished processing ... response_string = [" + response_string + "]");
-          response.render('visual', { title: 'Activity Data for old person with qrcode [' + phone + "]", message: response_string, qrcode: qrcode })
+          response.render('visual', { title: 'Activity Data for old person with qrcode [' + qrcode + "]", message: response_string, qrcode: qrcode })
           // response.send("response_string = [" + response_string + "]");
           // response.end(); // cause error 'cannot set headers after being sent'
         });
@@ -327,7 +327,7 @@ app.post('/add_older', function(request, response){
         var dbo = db.db(stopfalls_db);
         // var myobj = { name: "Company Inc", address: "Highway 37" };
 
-        console.log("phone: ", request.body.phone);
+        console.log("phone: ",    request.body.phone);
         console.log("qrcode: ",   request.body.qrcode);
 
         var myobj = request.body;
