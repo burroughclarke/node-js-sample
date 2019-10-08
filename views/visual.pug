@@ -6,37 +6,51 @@ html
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.js"></script>
   body
     h1.kitty#kittyid= title
+    h2= title2
+
     <div id="graphdiv"></div>
+    <div id="graphdiv2"></div>
 
 script.
  
  // console.log("message = " + message); // 'timestamp is not defined'
  // mymessage = !{message} // 'timestamp is not defined'
- let kittystring = !{JSON.stringify(message)}
  // console.log("mymessage: " + mymessage)
  // kittystring = document.getElementById("kittyid");
+
+ let kittystring = !{JSON.stringify(message)}
+ let kittystring2 = !{JSON.stringify(message2)}
+
  console.log("kittystring = " + kittystring);
 
  g = new Dygraph(
+       // containing div
+       document.getElementById("graphdiv"),
 
- // containing div
- document.getElementById("graphdiv"),
+       kittystring,
 
- kittystring,
+        {
+          // customBars: true,
+          title: 'Accelerometer Data for [' + !{JSON.stringify(qrcode)} + "]",
+          ylabel: 'G Force',
+          // legend: 'always',
+          // showRangeSelector: true
+        },
+ );
 
-  {
-    // customBars: true,
-    title: 'Activity Data for [' + !{JSON.stringify(qrcode)} + "]",
-    ylabel: 'G Force',
-    // legend: 'always',
-    // showRangeSelector: true
-  },
+  g2 = new Dygraph(
+       // containing div
+       document.getElementById("graphdiv2"),
 
- // working: 
- //"Date,Temperature\n" +
- //"2008-05-07,75\n" +
- //"2008-05-08,70\n" +
- //"2008-05-09,80\n"
+       kittystring2,
+
+        {
+          // customBars: true,
+          title: 'Step Data for [' + !{JSON.stringify(qrcode)} + "]",
+          ylabel: 'Steps',
+          // legend: 'always',
+          // showRangeSelector: true
+        },
 
  );
 
@@ -62,10 +76,6 @@ script.
  //        });
  //  });
 
-// comment
-
-// why???
-// 
 
 
 // feature extraction

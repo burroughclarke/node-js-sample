@@ -62,7 +62,10 @@ app.get('/visual', function(request, response) {
   console.log("retrieving activity data for qrcode [" + qrcode + "]");
 
   myqry = { "qrcode": qrcode};
-  response_string = "timestamp,accel-X,accel-Y,accel-Z\n";
+
+  response_string_steps = "timestamp,steps\n";
+  response_string       = "timestamp,accel-X,accel-Y,accel-Z\n";
+
   MongoClient.connect(mongo_uri, function(err, db) {
       console.log("POST: MongoDB connected");
       if (err) throw err;
@@ -74,11 +77,26 @@ app.get('/visual', function(request, response) {
           if (err) {
             console.log(err);
           }
+
+          // same query, just different collection
+          dbo.collection("stopfalls_steps").find(myqry).forEach(function(doc) {
+              response_string_steps += doc['timestamp'] + "," + doc['step'] + "\n"
+              console.log(doc);
+            }, function(err) {
+              if (err) {
+                console.log(err);
+              }
+              // done or error
+              console.log("finished processing ... response_string_steps = [" + response_string_steps + "]");
+              response.render('visual', { title: "StopFalls Activity Data", title2: 'Old person with qrcode [' + qrcode + "]", message: response_string, qrcode: qrcode, message2: response_string_steps })
+              // response.send("response_string = [" + response_string + "]");
+              // response.end(); // cause error 'cannot set headers after being sent'
+            });
+
           // done or error
-          console.log("finished processing ... response_string = [" + response_string + "]");
-          response.render('visual', { title: 'Activity Data for old person with qrcode [' + qrcode + "]", message: response_string, qrcode: qrcode })
-          // response.send("response_string = [" + response_string + "]");
-          // response.end(); // cause error 'cannot set headers after being sent'
+          // console.log("finished processing ... response_string = [" + response_string + "]");
+          // response.render('visual', { title: "StopFalls Activity Data", title2: 'Old person with qrcode [' + qrcode + "]", message: response_string, qrcode: qrcode })
+
         });
   });
 
