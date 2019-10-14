@@ -140,7 +140,7 @@ app.post('/activity_data', function(request, response){
 });
 
 // Access the parse results as request.body
-app.post('/activity_fall', function(request, response){
+app.post('/activity_falls', function(request, response){
   console.log("request.body:");
   console.log(request.body);
 
