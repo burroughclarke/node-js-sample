@@ -140,6 +140,39 @@ app.post('/activity_data', function(request, response){
 });
 
 // Access the parse results as request.body
+app.post('/activity_fall', function(request, response){
+  console.log("request.body:");
+  console.log(request.body);
+
+    // prints lots of data
+    // console.log("request:");
+    // console.log(request)
+
+    var ip = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
+    console.log("client ip: " + ip)
+
+    // var myJSON = { "name": "Chris", "age": "38" };
+    response.send("fall data received");
+
+    MongoClient.connect(mongo_uri, function(err, db) {
+        console.log("POST: MongoDB connected");
+        if (err) throw err;
+        var dbo = db.db(stopfalls_db);
+        // var myobj = { name: "Company Inc", address: "Highway 37" };
+        var myobj = request.body;
+        dbo.collection("stopfalls_falls").insertOne(myobj, function(err, res) {
+            if (err) throw err;
+            console.log("POST: 1 document inserted");
+            db.close();
+        });
+    });
+
+    // connection is taking far too long to close
+    response.end();
+    // will not reach here
+});
+
+// Access the parse results as request.body
 app.post('/activity_step', function(request, response){
   console.log("request.body:");
   console.log(request.body);
@@ -444,9 +477,9 @@ app.post('/clear_activity', function(request, response){
 //    client.close();
 // });
 
-const MongoClient = require('mongodb').MongoClient;
+// const MongoClient = require('mongodb').MongoClient;
 
-/* *********** Create ethereum accounts here ************** */
+// /* *********** Create ethereum accounts here ************** */
 // var Web3 = require("web3");
 // var web3 = new Web3('http://localhost:8545'); // your geth
 // var account = web3.eth.accounts.create();
