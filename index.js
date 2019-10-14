@@ -158,7 +158,6 @@ app.post('/activity_falls', function(request, response){
         console.log("POST: MongoDB connected");
         if (err) throw err;
         var dbo = db.db(stopfalls_db);
-        // var myobj = { name: "Company Inc", address: "Highway 37" };
         var myobj = request.body;
         dbo.collection("stopfalls_falls").insertOne(myobj, function(err, res) {
             if (err) throw err;
@@ -463,7 +462,7 @@ app.post('/clear_activity', function(request, response){
 // replace the uri string with your connection string.
 
 //           mongodb+srv://burrough:mittens@stopfalls-neprh.mongodb.net/test?retryWrites=true&w=majority
-// const MongoClient = require('mongodb').MongoClient;
+const MongoClient = require('mongodb').MongoClient;
 // MongoClient.connect(mongo_uri, function(err, client) {
 //    if(err) {
 //         console.log('Error occurred while connecting to MongoDB Atlas...\n',err);
