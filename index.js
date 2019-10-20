@@ -102,6 +102,33 @@ app.get('/visual', function(request, response) {
 
 })
 
+app.get('/data_activity', function(request, response) {
+
+  var qrcode = request.query.qrcode;
+
+  console.log("retrieving activity data for qrcode [" + qrcode + "]");
+
+  myqry = { "qrcode": qrcode};
+
+  response_string       = "timestamp,accel-X,accel-Y,accel-Z\n";
+
+  MongoClient.connect(mongo_uri, function(err, db) {
+      console.log("POST: MongoDB connected");
+      if (err) throw err;
+      var dbo = db.db(stopfalls_db);
+      dbo.collection("stopfalls_activity").find(myqry).forEach(function(doc) {
+          response_string += doc['timestamp'] + "," + doc['accelX'] + "," + doc['accelY'] + "," + doc['accelZ'] + "\n"
+          console.log(doc);
+        }, function(err) {
+          if (err) {
+            console.log(err);
+          }
+            response.send(response_string);
+        });
+  });
+
+})
+
 app.listen(app.get('port'), function() {
   console.log("Node app is running at localhost:" + app.get('port'))
 })
