@@ -158,7 +158,7 @@ app.get('/visual_tug', function(request, response) {
             console.log(err);
           }
           // done or error
-          console.log("finished processing ... response_string_steps = [" + response_string_steps + "]");
+          console.log("finished processing ... response_string_steps = [" + response_string_tugs + "]");
           response.render('visual', { title: "StopFalls TUG Data", title2: 'Old person with qrcode [' + qrcode + "]", message: response_string_tugs, qrcode: qrcode, x_axis: "time", y_axis: "time taken to complete TUG"})
           // response.send("response_string = [" + response_string + "]");
           // response.end(); // cause error 'cannot set headers after being sent'
