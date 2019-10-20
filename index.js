@@ -204,6 +204,39 @@ app.post('/activity_step', function(request, response){
     // will not reach here
 });
 
+
+// Access the parse results as request.body
+app.post('/tugs', function(request, response){
+  console.log("request.body:");
+  console.log(request.body);
+
+    // prints lots of data
+    // console.log("request:");
+    // console.log(request)
+
+    var ip = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
+    console.log("client ip: " + ip)
+
+    // var myJSON = { "name": "Chris", "age": "38" };
+    response.send("tug data received");
+
+    MongoClient.connect(mongo_uri, function(err, db) {
+        console.log("POST: MongoDB connected");
+        if (err) throw err;
+        var dbo = db.db(stopfalls_db);
+        // var myobj = { name: "Company Inc", address: "Highway 37" };
+        var myobj = request.body;
+        dbo.collection("stopfalls_tugs").insertOne(myobj, function(err, res) {
+            if (err) throw err;
+            console.log("POST: 1 document inserted");
+            db.close();
+        });
+    });
+    // connection is taking far too long to close
+    response.end();
+    // will not reach here
+});
+
 // Access the parse results as request.body
 app.post('/login', function(request, response){
     console.log("request.body:");
@@ -462,7 +495,12 @@ app.post('/clear_activity', function(request, response){
 // replace the uri string with your connection string.
 
 //           mongodb+srv://burrough:mittens@stopfalls-neprh.mongodb.net/test?retryWrites=true&w=majority
+
+
+// do not comment out! will break all API methods!
 const MongoClient = require('mongodb').MongoClient;
+
+
 // MongoClient.connect(mongo_uri, function(err, client) {
 //    if(err) {
 //         console.log('Error occurred while connecting to MongoDB Atlas...\n',err);
