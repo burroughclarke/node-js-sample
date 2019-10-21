@@ -27,6 +27,24 @@ script.
        let xstring = kittystring.split("x=[")[numFalls].split(", y=")[0];
        let ystring = kittystring.split(", y=[")[numFalls].split(", z=")[0];
        let zstring = kittystring.split(", z=[")[numFalls].split("]")[0] + "]";
+       let timestamp = kittystring.split("timestamp=")[numFalls].split(",")[0]
+
+       console.log("timestamp:" + timestamp);
+
+       var date = new Date(parseInt(timestamp)*1000);
+      // Hours part from the timestamp
+      var year = date.getYear();
+      var month = date.getMonth();
+      var day = date.getDate();
+      var hours = date.getHours();
+      // Minutes part from the timestamp
+      var minutes = "0" + date.getMinutes();
+      // Seconds part from the timestamp
+      var seconds = "0" + date.getSeconds();
+
+      // Will display time in 10:30:23 format
+      var formattedTime = year + "-" + month + "-" + day + ", " + hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+
        let kittytitle = !{JSON.stringify(title)};
 
        let csv_parsed = "x,y,z\n";
@@ -58,7 +76,7 @@ script.
 
               {
                 // customBars: true,
-                title: 'Qr code: [' + !{JSON.stringify(qrcode)} + "]",
+                title: "Time: " + formattedTime,
                 ylabel: yaxis,
                 xlabel: xaxis,
                 // legend: 'always',

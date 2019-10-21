@@ -52,7 +52,10 @@ function timeConverter(UNIX_timestamp){
   return time;
 }
 
-app.get('/visual_steps', function(request, response) {
+// raw activity:
+// http://localhost:5000/visual_activity?qrcode=ZwWR4diEsL7lrNtohYGs
+
+app.get('/visual_activity', function(request, response) {
 
   var qrcode = request.query.qrcode;
 
@@ -60,8 +63,45 @@ app.get('/visual_steps', function(request, response) {
 
   myqry = { "qrcode": qrcode};
 
+  response_string = "timestamp,accel-X,accel-Y,accel-Z\n";
+
+  MongoClient.connect(mongo_uri, function(err, db) {
+      console.log("POST: MongoDB connected");
+      if (err) throw err;
+      var dbo = db.db(stopfalls_db);
+      // same query, just different collection
+      var response_string_steps = ""
+      dbo.collection("stopfalls_activity").find(myqry).forEach(function(doc) {
+          response_string += doc['timestamp'] + "," + doc['accelX'] + "," + doc['accelY'] + "," + doc['accelZ'] + "\n"
+          console.log(doc);
+        }, function(err) {
+          if (err) {
+            console.log(err);
+          }
+          // done or error
+          console.log("finished processing ... response_string = [" + response_string + "]");
+          response.render('visual', { title: "StopFalls Raw Activity Data", title2: 'Old person with qrcode [' + qrcode + "]", message: response_string, qrcode: qrcode, x_axis: "time", y_axis: "Average G-force" })
+          // response.send("response_string = [" + response_string + "]");
+          // response.end(); // cause error 'cannot set headers after being sent'
+        });
+
+      // done or error
+      // console.log("finished processing ... response_string = [" + response_string + "]");
+      // response.render('visual', { title: "StopFalls Activity Data", title2: 'Old person with qrcode [' + qrcode + "]", message: response_string, qrcode: qrcode })
+
+  });
+
+})
+
+app.get('/visual_steps', function(request, response) {
+
+  var qrcode = request.query.qrcode;
+
+  console.log("retrieving step data for qrcode [" + qrcode + "]");
+
+  myqry = { "qrcode": qrcode};
+
   response_string_steps = "timestamp,steps\n";
-  response_string       = "timestamp,accel-X,accel-Y,accel-Z\n";
 
   MongoClient.connect(mongo_uri, function(err, db) {
       console.log("POST: MongoDB connected");
@@ -86,7 +126,7 @@ app.get('/visual_steps', function(request, response) {
       // done or error
       // console.log("finished processing ... response_string = [" + response_string + "]");
       // response.render('visual', { title: "StopFalls Activity Data", title2: 'Old person with qrcode [' + qrcode + "]", message: response_string, qrcode: qrcode })
-;
+
   });
 
 })
@@ -116,24 +156,22 @@ app.get('/visual_falls', function(request, response) {
             console.log(err);
           }
           // done or error
-           let kittystring = JSON.stringify(response_string_falls);
-           let xstring = kittystring.split("x=")[1].split(", y=")[0];
-           let ystring = kittystring.split(", y=")[1].split(", z=")[0];
-           let zstring = kittystring.split(", z=")[1].split("]")[0] + "]";
-           let csv_parsed = "x,y,z\n";
-           let x_items = xstring.split(",");
-           let y_items = ystring.split(",");
-           let z_items = zstring.split(",");
-           for (var i = 0; i < x_items.length; i++) {
-              csv_parsed += x_items[i] + ",";
-              csv_parsed += y_items[i] + ",";
-              csv_parsed += z_items[i] + "\n";
-           }
+          console.log("response_string_falls= [" + response_string_falls + "]")
+          let kittystring = JSON.stringify(response_string_falls);
+          let csv_parsed = "x,y,z\n";
+          if (response_string_falls != "") {
+               console.log("kittystring=[" + kittystring+ "]");
+      
+              num_falls = kittystring.split("fall").length - 1;
+               var subtitle = 'Falls recorded: [' + parseInt(num_falls) + "]";
+          } else {
+              var subtitle = "No falls recorded";
+          }
 
           console.log("response_string_falls = [" + response_string_falls + "]");
           console.log("csv_parsed = [" + csv_parsed + "]");
 
-          response.render('falls', { title: "StopFalls Fall Data", title2: 'Old person with qrcode [' + qrcode + "]", message: response_string_falls, qrcode: qrcode, x_axis: "time", y_axis: "average G-force"})
+          response.render('falls', { title: "StopFalls Fall Data", title2: subtitle, message: response_string_falls, qrcode: qrcode, x_axis: "time", y_axis: "average G-force"})
           // response.send("response_string = [" + response_string + "]");
           // response.end(); // cause error 'cannot set headers after being sent'
         });
@@ -172,41 +210,6 @@ app.get('/visual_tug', function(request, response) {
 
   });
 })
-
-
-app.get('/visual_tug', function(request, response) {
-
-  var qrcode = request.query.qrcode;
-
-  console.log("retrieving activity data for qrcode [" + qrcode + "]");
-
-  myqry = { "qrcode": qrcode};
-
-  response_string_tugs = "timestamp,tug_duration\n";
-
-  MongoClient.connect(mongo_uri, function(err, db) {
-      console.log("POST: MongoDB connected");
-      if (err) throw err;
-      var dbo = db.db(stopfalls_db);
-      // same query, just different collection
-      dbo.collection("stopfalls_tugs").find(myqry).forEach(function(doc) {
-          response_string_tugs += doc['timestamp'] + "," + doc['tug_time'] + "\n"
-          console.log(doc);
-        }, function(err) {
-          if (err) {
-            console.log(err);
-          }
-          // done or error
-          console.log("finished processing ... response_string_steps = [" + response_string_tugs + "]");
-          response.render('visual', { title: "StopFalls TUG Data", title2: 'Old person with qrcode [' + qrcode + "]", message: response_string_tugs, qrcode: qrcode, x_axis: "time", y_axis: "time taken to complete TUG"})
-          // response.send("response_string = [" + response_string + "]");
-          // response.end(); // cause error 'cannot set headers after being sent'
-        });
-
-  });
-})
-
-
 
 
 
