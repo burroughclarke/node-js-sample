@@ -52,7 +52,7 @@ function timeConverter(UNIX_timestamp){
   return time;
 }
 
-app.get('/visual', function(request, response) {
+app.get('/visual_steps', function(request, response) {
 
   var qrcode = request.query.qrcode;
 
@@ -67,34 +67,26 @@ app.get('/visual', function(request, response) {
       console.log("POST: MongoDB connected");
       if (err) throw err;
       var dbo = db.db(stopfalls_db);
-      dbo.collection("stopfalls_activity").find(myqry).forEach(function(doc) {
-          response_string += doc['timestamp'] + "," + doc['accelX'] + "," + doc['accelY'] + "," + doc['accelZ'] + "\n"
+      // same query, just different collection
+      var response_string_steps = ""
+      dbo.collection("stopfalls_steps").find(myqry).forEach(function(doc) {
+          response_string_steps += doc['timestamp'] + "," + doc['step'] + "\n"
           console.log(doc);
         }, function(err) {
           if (err) {
             console.log(err);
           }
-
-          // same query, just different collection
-          dbo.collection("stopfalls_steps").find(myqry).forEach(function(doc) {
-              response_string_steps += doc['timestamp'] + "," + doc['step'] + "\n"
-              console.log(doc);
-            }, function(err) {
-              if (err) {
-                console.log(err);
-              }
-              // done or error
-              console.log("finished processing ... response_string_steps = [" + response_string_steps + "]");
-              response.render('visual', { title: "StopFalls Activity Data", title2: 'Old person with qrcode [' + qrcode + "]", message: response_string, qrcode: qrcode, x_axis: "time", y_axis: "number of steps" })
-              // response.send("response_string = [" + response_string + "]");
-              // response.end(); // cause error 'cannot set headers after being sent'
-            });
-
           // done or error
-          // console.log("finished processing ... response_string = [" + response_string + "]");
-          // response.render('visual', { title: "StopFalls Activity Data", title2: 'Old person with qrcode [' + qrcode + "]", message: response_string, qrcode: qrcode })
-
+          console.log("finished processing ... response_string_steps = [" + response_string_steps + "]");
+          response.render('visual', { title: "StopFalls Step Data", title2: 'Old person with qrcode [' + qrcode + "]", message: response_string_steps, qrcode: qrcode, x_axis: "time", y_axis: "number of steps" })
+          // response.send("response_string = [" + response_string + "]");
+          // response.end(); // cause error 'cannot set headers after being sent'
         });
+
+      // done or error
+      // console.log("finished processing ... response_string = [" + response_string + "]");
+      // response.render('visual', { title: "StopFalls Activity Data", title2: 'Old person with qrcode [' + qrcode + "]", message: response_string, qrcode: qrcode })
+;
   });
 
 })
