@@ -1,0 +1,98 @@
+html
+  head
+    title= title
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.js"></script>
+  body
+    h1.kitty#kittyid= title
+    h2= title2
+
+    <div id="graphdiv1"></div>
+    <div id="graphdiv2"></div>
+    <div id="graphdiv3"></div>
+    <div id="graphdiv4"></div>
+    <div id="graphdiv5"></div>
+
+script.
+  
+
+
+ let kittystring = !{JSON.stringify(message)};
+ let yaxis = !{JSON.stringify(y_axis)};
+ let xaxis = !{JSON.stringify(x_axis)};
+
+
+  for (var numFalls = 1; numFalls < kittystring.split("fall").length; numFalls++) {
+       let xstring = kittystring.split("x=[")[numFalls].split(", y=")[0];
+       let ystring = kittystring.split(", y=[")[numFalls].split(", z=")[0];
+       let zstring = kittystring.split(", z=[")[numFalls].split("]")[0] + "]";
+       let kittytitle = !{JSON.stringify(title)};
+
+       let csv_parsed = "x,y,z\n";
+       let x_items = xstring.split(",");
+       let y_items = ystring.split(",");
+       let z_items = zstring.split(",");
+
+       for (var i = 0; i < x_items.length; i++) {
+          csv_parsed += x_items[i] + ",";
+          csv_parsed += y_items[i] + ",";
+          csv_parsed += z_items[i] + "\n";
+       }
+
+       console.log("kittytitle = " + kittytitle);
+       console.log("kittystring = " + kittystring);
+       console.log("yaxis = " + yaxis);
+       console.log("xstring = " + xstring);
+       console.log("ystring = " + ystring);
+       console.log("zstring = " + zstring);
+       console.log("csv_parsed = " + csv_parsed);
+
+
+
+       g = new Dygraph(
+             // containing div
+             document.getElementById("graphdiv" + numFalls.toString()),
+
+             csv_parsed,
+
+              {
+                // customBars: true,
+                title: 'Qr code: [' + !{JSON.stringify(qrcode)} + "]",
+                ylabel: yaxis,
+                xlabel: xaxis,
+                // legend: 'always',
+                // showRangeSelector: true
+              },
+       );
+
+  }
+
+
+ 
+
+
+ // const mongo_uri    = "mongodb+srv://burrough:mittens@stopfalls-neprh.mongodb.net/test?retryWrites=true&w=majority"
+ // const MongoClient = require('mongodb').MongoClient;
+ // MongoClient.connect(mongo_uri, function(err, db) {
+ //      console.log("POST: MongoDB connected");
+ //      if (err) throw err;
+ //      var dbo = db.db(stopfalls_db);
+ //      dbo.collection("stopfalls_activity").find(myqry).forEach(function(doc) {
+ //          response_string += doc['timestamp'] + "," + doc['accelX'] + "," + doc['accelY']+ "," + doc['accelZ']
+ //          console.log(doc);
+ //        }, function(err) {
+ //          if (err) {
+ //            console.log(err);
+ //          }
+ //          // done or error
+ //          console.log("finished processing ...");
+ //          // response.send("response_string = [" + response_string + "]");
+ //          // response.end(); // cause error 'cannot set headers after being sent'
+ //        });
+ //  });
+
+
+
+// feature extraction
+// 

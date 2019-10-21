@@ -38,9 +38,6 @@ app.get('/', function(request, response) {
   response.end();
 })
 
-app.get('/home', function(request, response) {
-  response.render('visual', { title: 'Hey', message: 'Hello there!' })
-})
 
 function timeConverter(UNIX_timestamp){
   var a = new Date(UNIX_timestamp * 1000);
@@ -103,7 +100,7 @@ app.get('/visual', function(request, response) {
 })
 
 
-app.get('/visual_steps', function(request, response) {
+app.get('/visual_falls', function(request, response) {
 
   var qrcode = request.query.qrcode;
 
@@ -111,29 +108,79 @@ app.get('/visual_steps', function(request, response) {
 
   myqry = { "qrcode": qrcode};
 
-  response_string_steps = "timestamp,steps\n";
+  response_string_falls = "";
 
   MongoClient.connect(mongo_uri, function(err, db) {
       console.log("POST: MongoDB connected");
       if (err) throw err;
       var dbo = db.db(stopfalls_db);
       // same query, just different collection
-      dbo.collection("stopfalls_steps").find(myqry).forEach(function(doc) {
-          response_string_steps += doc['timestamp'] + "," + doc['step'] + "\n"
+      dbo.collection("stopfalls_falls").find(myqry).forEach(function(doc) {
+          response_string_falls += "[fall timestamp=" + doc['timestamp'] + ", realFall=" + doc['realFall'] + ", x=" + doc['accelX'] + ", y=" + doc['accelY'] + ", z=" + doc['accelZ'] + "]" + "\n"
+          
           console.log(doc);
         }, function(err) {
           if (err) {
             console.log(err);
           }
           // done or error
-          console.log("finished processing ... response_string_steps = [" + response_string_steps + "]");
-          response.render('visual', { title: "StopFalls Step Data", title2: 'Old person with qrcode [' + qrcode + "]", message: response_string_steps, qrcode: qrcode, x_axis: "time", y_axis: "average G-force"})
+           let kittystring = JSON.stringify(response_string_falls);
+           let xstring = kittystring.split("x=")[1].split(", y=")[0];
+           let ystring = kittystring.split(", y=")[1].split(", z=")[0];
+           let zstring = kittystring.split(", z=")[1].split("]")[0] + "]";
+           let csv_parsed = "x,y,z\n";
+           let x_items = xstring.split(",");
+           let y_items = ystring.split(",");
+           let z_items = zstring.split(",");
+           for (var i = 0; i < x_items.length; i++) {
+              csv_parsed += x_items[i] + ",";
+              csv_parsed += y_items[i] + ",";
+              csv_parsed += z_items[i] + "\n";
+           }
+
+          console.log("response_string_falls = [" + response_string_falls + "]");
+          console.log("csv_parsed = [" + csv_parsed + "]");
+
+          response.render('falls', { title: "StopFalls Fall Data", title2: 'Old person with qrcode [' + qrcode + "]", message: response_string_falls, qrcode: qrcode, x_axis: "time", y_axis: "average G-force"})
           // response.send("response_string = [" + response_string + "]");
           // response.end(); // cause error 'cannot set headers after being sent'
         });
 
   });
 })
+
+app.get('/visual_tug', function(request, response) {
+
+  var qrcode = request.query.qrcode;
+
+  console.log("retrieving activity data for qrcode [" + qrcode + "]");
+
+  myqry = { "qrcode": qrcode};
+
+  response_string_tugs = "timestamp,tug_duration\n";
+
+  MongoClient.connect(mongo_uri, function(err, db) {
+      console.log("POST: MongoDB connected");
+      if (err) throw err;
+      var dbo = db.db(stopfalls_db);
+      // same query, just different collection
+      dbo.collection("stopfalls_tugs").find(myqry).forEach(function(doc) {
+          response_string_tugs += doc['timestamp'] + "," + doc['tug_time'] + "\n"
+          console.log(doc);
+        }, function(err) {
+          if (err) {
+            console.log(err);
+          }
+          // done or error
+          console.log("finished processing ... response_string_steps = [" + response_string_tugs + "]");
+          response.render('visual', { title: "StopFalls TUG Data", title2: 'Old person with qrcode [' + qrcode + "]", message: response_string_tugs, qrcode: qrcode, x_axis: "time", y_axis: "time taken to complete TUG"})
+          // response.send("response_string = [" + response_string + "]");
+          // response.end(); // cause error 'cannot set headers after being sent'
+        });
+
+  });
+})
+
 
 app.get('/visual_tug', function(request, response) {
 
