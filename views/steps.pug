@@ -9,6 +9,7 @@ html
     h2= title2
 
     <div id="graphdiv"></div>
+    <div>   </div>
 
 script.
  
@@ -26,6 +27,7 @@ script.
        document.getElementById("graphdiv"),
 
        kittystring,
+
         {
           // customBars: true,
           title: 'Qr code: [' + !{JSON.stringify(qrcode)} + "]",
@@ -36,8 +38,56 @@ script.
         },
  );
 
+ entryrows = kittystring.split("\n");
+ // console.log("string start time: " + kittystring.split(",")[0])
+ var start_time = parseInt( kittystring.split(",")[0] ) / 25.54270
+ var orig_start_time = start_time
+ console.log("start time: " + start_time);
+ var totals_for_each_period = [0];
+ var period_pos = 0;
 
- console.log("miow");
+ for (var i = 0; i < entryrows.length; i++) {
+    console.log("entry_row[i]: [" + entryrows[i] + "]")
+    if (entryrows[i] == "") {
+      continue;
+    }
+
+    step_value = entryrows[i].split(",")[1]//.replace("\n", "")
+    console.log("string step value: " + step_value)
+
+    if ( parseInt(entryrows[i].split(",")) < start_time + 86400) {
+        totals_for_each_period[period_pos] += parseInt( step_value);
+    } else {
+        totals_for_each_period.push( parseInt( entryrows[i].split(",")[1].trim() ) );
+        period_pos++;
+    }
+ }
+
+
+ for (var j = 0; j < totals_for_each_period.length; j++) {
+      var date = new Date(parseInt(orig_start_time)*1000);
+      // Hours part from the timestamp
+      var year = date.getYear();
+      var month = date.getMonth();
+      var day = date.getDate();
+      var hours = date.getHours();
+      // Minutes part from the timestamp
+      var minutes = "0" + date.getMinutes();
+      // Seconds part from the timestamp
+      var seconds = "0" + date.getSeconds();
+
+      // Will display time in 10:30:23 format
+      var formattedTime = year + "-" + month + "-" + day;
+      
+      console.log("formattedTime: " + formattedTime)
+
+      orig_start_time = parseInt(orig_start_time) + 86400
+      document.body.innerHTML += '<br><div>' + formattedTime + ': <span style="color:red">' + totals_for_each_period[j] + '</span></div>';
+
+ }
+
+ console.log("totals for each day: ", totals_for_each_period);
+
 
  // const mongo_uri    = "mongodb+srv://burrough:mittens@stopfalls-neprh.mongodb.net/test?retryWrites=true&w=majority"
  // const MongoClient = require('mongodb').MongoClient;

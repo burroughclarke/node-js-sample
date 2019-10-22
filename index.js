@@ -101,14 +101,13 @@ app.get('/visual_steps', function(request, response) {
 
   myqry = { "qrcode": qrcode};
 
-  response_string_steps = "timestamp,steps\n";
+  var response_string_steps = "";
 
   MongoClient.connect(mongo_uri, function(err, db) {
       console.log("POST: MongoDB connected");
       if (err) throw err;
       var dbo = db.db(stopfalls_db);
       // same query, just different collection
-      var response_string_steps = ""
       dbo.collection("stopfalls_steps").find(myqry).forEach(function(doc) {
           response_string_steps += doc['timestamp'] + "," + doc['steps'] + "\n"
           console.log(doc);
@@ -118,7 +117,8 @@ app.get('/visual_steps', function(request, response) {
           }
           // done or error
           console.log("finished processing ... response_string_steps = [" + response_string_steps + "]");
-          response.render('visual', { title: "StopFalls Step Data", title2: 'Old person with qrcode [' + qrcode + "]", message: response_string_steps, qrcode: qrcode, x_axis: "time", y_axis: "number of steps" })
+          response_string_steps = response_string_steps.replace("undefined", "1");
+          response.render('steps', { title: "StopFalls Step Data", title2: 'Old person with qrcode [' + qrcode + "]", message: response_string_steps, qrcode: qrcode, x_axis: "time", y_axis: "number of steps" })
           // response.send("response_string = [" + response_string + "]");
           // response.end(); // cause error 'cannot set headers after being sent'
         });
