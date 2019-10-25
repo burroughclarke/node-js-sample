@@ -161,9 +161,14 @@ app.get('/visual_falls', function(request, response) {
           let csv_parsed = "x,y,z\n";
           if (response_string_falls != "") {
                console.log("kittystring=[" + kittystring+ "]");
-      
-              num_falls = kittystring.split("fall").length - 1;
-               var subtitle = 'Falls recorded: [' + parseInt(num_falls) + "]";
+  
+              kittystring.split("realFall=false").length
+
+              num_false_falls = kittystring.split("realFall=false").length - 1;
+              num_true_falls  = kittystring.split("realFall=true").length - 1;
+
+               var subtitle = 'False-alarm falls: [' + parseInt(num_false_falls) + "]\n" +
+                              'Genuine falls: ['  + parseInt(num_true_falls) + "]";
           } else {
               var subtitle = "No falls recorded";
           }
