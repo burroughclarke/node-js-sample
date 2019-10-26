@@ -93,6 +93,154 @@ app.get('/visual_activity', function(request, response) {
 
 })
 
+app.get('/get_accel_data', function(request, response) {
+
+  var qrcode = request.query.qrcode;
+
+  console.log("retrieving activity data for qrcode [" + qrcode + "]");
+
+  myqry = { "qrcode": qrcode};
+
+  response_string = "timestamp,accel-X,accel-Y,accel-Z\n";
+
+  MongoClient.connect(mongo_uri, function(err, db) {
+      console.log("POST: MongoDB connected");
+      if (err) throw err;
+      var dbo = db.db(stopfalls_db);
+      // same query, just different collection
+      dbo.collection("stopfalls_activity").find(myqry).forEach(function(doc) {
+          response_string += doc['timestamp'] + "," + doc['accelX'] + "," + doc['accelY'] + "," + doc['accelZ'] + "\n"
+          console.log(doc);
+        }, function(err) {
+          if (err) {
+            console.log(err);
+          }
+          // done or error
+          console.log("finished processing ... response_string = [" + response_string + "]");
+          response.send(response_string)
+          // response.send("response_string = [" + response_string + "]");
+          // response.end(); // cause error 'cannot set headers after being sent'
+        });
+
+      // done or error
+      // console.log("finished processing ... response_string = [" + response_string + "]");
+      // response.render('visual', { title: "StopFalls Activity Data", title2: 'Old person with qrcode [' + qrcode + "]", message: response_string, qrcode: qrcode })
+
+  });
+
+})
+
+app.get('/get_step_data', function(request, response) {
+
+  var qrcode = request.query.qrcode;
+
+  console.log("retrieving step data for qrcode [" + qrcode + "]");
+
+  myqry = { "qrcode": qrcode};
+
+  var response_string_steps = "";
+
+  MongoClient.connect(mongo_uri, function(err, db) {
+      console.log("POST: MongoDB connected");
+      if (err) throw err;
+      var dbo = db.db(stopfalls_db);
+      // same query, just different collection
+      dbo.collection("stopfalls_steps").find(myqry).forEach(function(doc) {
+          response_string_steps += doc['timestamp'] + "," + doc['steps'] + "\n"
+          console.log(doc);
+        }, function(err) {
+          if (err) {
+            console.log(err);
+          }
+          // done or error
+          console.log("finished processing ... response_string_steps = [" + response_string_steps + "]");
+          response_string_steps = response_string_steps.replace("undefined", "1");
+          response.send(response_string_steps)
+          // response.send("response_string = [" + response_string + "]");
+          // response.end(); // cause error 'cannot set headers after being sent'
+        });
+
+      // done or error
+      // console.log("finished processing ... response_string = [" + response_string + "]");
+      // response.render('visual', { title: "StopFalls Activity Data", title2: 'Old person with qrcode [' + qrcode + "]", message: response_string, qrcode: qrcode })
+
+  });
+
+})
+
+
+app.get('/get_fall_data', function(request, response) {
+
+  var qrcode = request.query.qrcode;
+
+  console.log("retrieving activity data for qrcode [" + qrcode + "]");
+
+  myqry = { "qrcode": qrcode};
+
+  response_string_falls = "";
+
+  MongoClient.connect(mongo_uri, function(err, db) {
+      console.log("POST: MongoDB connected");
+      if (err) throw err;
+      var dbo = db.db(stopfalls_db);
+      // same query, just different collection
+      dbo.collection("stopfalls_falls").find(myqry).forEach(function(doc) {
+          response_string_falls += "[fall timestamp=" + doc['timestamp'] + ", realFall=" + doc['realFall'] + ", x=" + doc['accelX'] + ", y=" + doc['accelY'] + ", z=" + doc['accelZ'] + "]" + "\n"
+          
+          console.log(doc);
+        }, function(err) {
+          if (err) {
+            console.log(err);
+          }
+          // done or error
+
+          console.log("response_string_falls = [" + response_string_falls + "]");
+
+
+          response.send(response_string_falls)
+          // response.send("response_string = [" + response_string + "]");
+          // response.end(); // cause error 'cannot set headers after being sent'
+        });
+  });
+})
+
+
+app.get('/get_tug_data', function(request, response) {
+
+  var qrcode = request.query.qrcode;
+
+  console.log("retrieving activity data for qrcode [" + qrcode + "]");
+
+  myqry = { "qrcode": qrcode};
+
+  response_string_tugs = "timestamp,tug_duration\n";
+
+  MongoClient.connect(mongo_uri, function(err, db) {
+      console.log("POST: MongoDB connected");
+      if (err) throw err;
+      var dbo = db.db(stopfalls_db);
+      // same query, just different collection
+      dbo.collection("stopfalls_tugs").find(myqry).forEach(function(doc) {
+          response_string_tugs += doc['timestamp'] + "," + doc['tug_time'] + "\n"
+          console.log(doc);
+        }, function(err) {
+          if (err) {
+            console.log(err);
+          }
+          // done or error
+          console.log("finished processing ... response_string_steps = [" + response_string_tugs + "]");
+          response.send(response_string_tugs)
+          // response.send("response_string = [" + response_string + "]");
+          // response.end(); // cause error 'cannot set headers after being sent'
+        });
+
+  });
+})
+
+
+
+
+
 app.get('/visual_steps', function(request, response) {
 
   var qrcode = request.query.qrcode;
@@ -215,7 +363,6 @@ app.get('/visual_tug', function(request, response) {
 
   });
 })
-
 
 
 app.get('/data_activity', function(request, response) {
