@@ -52,6 +52,8 @@ function timeConverter(UNIX_timestamp){
   return time;
 }
 
+
+
 // raw activity:
 // http://localhost:5000/visual_activity?qrcode=ZwWR4diEsL7lrNtohYGs
 
@@ -723,6 +725,42 @@ app.post('/add_older', function(request, response){
     // will not reach here
 });
 
+
+app.post('/remove_oldperson', function(request, response){
+    console.log("request.body:");
+    console.log(request.body);
+    
+    var myquery = {'oldname':request.body.oldname, 'phone':request.body.phone};
+
+    MongoClient.connect(mongo_uri, function(err, db) {
+        console.log("POST: MongoDB connected");
+        if (err) throw err;
+        var dbo = db.db(stopfalls_db);
+                                                  // do not put brackets around 'myquery' here:
+        dbo.collection("stopfalls_olds").deleteMany(myquery, function(err, res) {
+            // if (err) throw err;
+            response.send(res);
+            db.close();
+        });
+    });
+    // 1. submit the username and password into the database. 
+
+    // var ip = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
+    // console.log("client ip: " + ip)
+
+    // var myJSON = { "response code": "200", 
+    //                "description": "old person removed", 
+    //              };
+    // response.send(myJSON);
+    // response.end();
+    // will not reach here
+});
+
+
+// curl -i -X POST -H "Content-Type: application/json" -d '{"oldname":"dfluffy", "phone":"+61402671778"}' localhost:5000/remove_oldperson
+
+// retrieves record:
+// {phone: "+61402671778", oldname: "dluffy"}
 
 app.post('/clear_users', function(request, response){
     console.log("request.body:");
