@@ -656,6 +656,45 @@ app.post('/signup', function(request, response){
 
 // Access the parse results as request.body
 // (1) registration api : name, dob, user type, address, phone no, email id, 
+app.post('/update_password', function(request, response){
+    console.log("request.body:");
+    console.log(request.body);
+
+    MongoClient.connect(mongo_uri, function(err, db) {
+        console.log("POST: MongoDB connected");
+        if (err) throw err;
+        var dbo = db.db(stopfalls_db);
+        // var myobj = { name: "Company Inc", address: "Highway 37" };
+        
+        console.log("phone: ",     request.body.phone);
+        console.log("password: ",  request.body.password);
+
+        // define the records to update (though you are using 'updateOne')
+        var myquery = { "password" : request.body.password};
+
+        var myobj = request.body;
+        dbo.collection("stopfalls_users").update(myquery, myobj, function(err, res) {
+            if (err) throw err;
+            console.log("POST: updated");
+            db.close();
+        });
+    });
+    // 1. submit the username and password into the database. 
+
+    var ip = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
+    console.log("client ip: " + ip)
+
+    var myJSON = { "response code": "200", 
+                   "description": "user details updated for user [" + request.body.phone + "]",
+                 };
+    response.send(myJSON);
+    response.end();
+    // will not reach here
+});
+
+
+// Access the parse results as request.body
+// (1) registration api : name, dob, user type, address, phone no, email id, 
 app.post('/update_user', function(request, response){
     console.log("request.body:");
     console.log(request.body);
@@ -743,16 +782,6 @@ app.post('/remove_oldperson', function(request, response){
             db.close();
         });
     });
-    // 1. submit the username and password into the database. 
-
-    // var ip = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
-    // console.log("client ip: " + ip)
-
-    // var myJSON = { "response code": "200", 
-    //                "description": "old person removed", 
-    //              };
-    // response.send(myJSON);
-    // response.end();
     // will not reach here
 });
 
