@@ -656,7 +656,7 @@ app.post('/signup', function(request, response){
 
 // Access the parse results as request.body
 // (1) registration api : name, dob, user type, address, phone no, email id, 
-app.post('/update_password', function(request, response){
+app.post('/update_username', function(request, response){
     console.log("request.body:");
     console.log(request.body);
 
@@ -695,7 +695,7 @@ app.post('/update_password', function(request, response){
 
 // Access the parse results as request.body
 // (1) registration api : name, dob, user type, address, phone no, email id, 
-app.post('/update_user', function(request, response){
+app.post('/update_password', function(request, response){
     console.log("request.body:");
     console.log(request.body);
 
