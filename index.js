@@ -187,7 +187,7 @@ app.get('/get_fall_data', function(request, response) {
       var dbo = db.db(stopfalls_db);
       // same query, just different collection
       dbo.collection("stopfalls_falls").find(myqry).forEach(function(doc) {
-          response_string_falls += "[fall timestamp=" + doc['timestamp'] + ", realFall=" + doc['realFall'] + ", x=" + doc['accelX'] + ", y=" + doc['accelY'] + ", z=" + doc['accelZ'] + "]" + "\n"
+          response_string_falls += "[fall timestamp=" + doc['timestamp'] + ", realFall=" + doc['timestamp'] + ", locationLat=" + doc['locationLat'] + ", locationLon=" + doc['locationLon'] + ", x=" + doc['accelX'] + ", y=" + doc['accelY'] + ", z=" + doc['accelZ'] + "]" + "\n"
           
           console.log(doc);
         }, function(err) {
@@ -298,7 +298,7 @@ app.get('/visual_falls', function(request, response) {
       var dbo = db.db(stopfalls_db);
       // same query, just different collection
       dbo.collection("stopfalls_falls").find(myqry).forEach(function(doc) {
-          response_string_falls += "[fall timestamp=" + doc['timestamp'] + ", realFall=" + doc['realFall'] + ", x=" + doc['accelX'] + ", y=" + doc['accelY'] + ", z=" + doc['accelZ'] + "]" + "\n"
+          response_string_falls += "[fall timestamp=" + doc['timestamp'] + ", realFall=" + doc['timestamp'] + ", locationLat=" + doc['locationLat'] + ", locationLon=" + doc['locationLon'] + ", x=" + doc['accelX'] + ", y=" + doc['accelY'] + ", z=" + doc['accelZ'] + "]" + "\n"
           
           console.log(doc);
         }, function(err) {
